@@ -1,11 +1,12 @@
 
 import express from "express";
 import MyUserControllers from "../controllers/MyUserControllers";
+import { jwtCheck } from "../middleware/auth";
 
 
 const router = express.Router();
 
-router.post("/", MyUserControllers.createCurrentUser);
+router.post("/", jwtCheck, MyUserControllers.createCurrentUser);
 
 
 
