@@ -2,14 +2,19 @@ import { Navigate, Routes, Route } from "react-router-dom"
 import Layout from "./layouts/Layout";
 import HomePage from "./pages/HomePage";
 import AuthCallbackPage from "./pages/AuthCallbackPage";
-
+import UserProfilePage from "@/pages/UserProfilePage.tsx";
+import ProtectedRoute from "@/auth/ProtectedRoute.tsx";
+import ManageRestaurantPage from "@/pages/ManageRestaurantPage.tsx";
 
 const AppRoutes = () => {
     return(
         <Routes>
-                  <Route path="/" element={<Layout> <HomePage/> </Layout>} />
+                  <Route path="/" element={<Layout showHero> <HomePage/> </Layout>} />
                   <Route path="/auth-callback" element={<AuthCallbackPage /> } />
-                  <Route path="/user-profile" element={<span>User Profile Page</span>} />
+                  <Route element={<ProtectedRoute />}>
+                      <Route path="/user-profile" element={<Layout> <UserProfilePage /> </Layout>} />
+                      <Route path="/manage-restaurant" element={<Layout> <ManageRestaurantPage /> </Layout>} />
+                  </Route>
                   <Route path="*" element={<Navigate to="/" />} />
         </Routes>
     );
