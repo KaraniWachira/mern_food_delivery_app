@@ -15,7 +15,6 @@ export  const cuisineList = [
     "Mexican",
     "Halal",
     "Nigerian",
-    "Pasta",
     "Pizza",
     "Thai",
     "Seafood",
