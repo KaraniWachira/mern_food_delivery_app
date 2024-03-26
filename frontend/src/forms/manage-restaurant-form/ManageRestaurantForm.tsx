@@ -6,6 +6,11 @@ import CuisinesSection from "@/forms/manage-restaurant-form/CuisinesSection.tsx"
 import {Form} from "@/components/ui/form.tsx";
 import {useForm} from "react-hook-form";
 import MenuSection from "@/forms/manage-restaurant-form/MenuSection.tsx";
+import ImageSection from "@/forms/manage-restaurant-form/ImageSection.tsx";
+import LoadingButton from "@/components/LoadingButton.tsx";
+import {Button} from "@/components/ui/button.tsx";
+import {Restaurant} from "@/types.ts";
+import {useEffect} from "react";
 
 // use zod to validate and manage the schema
 const formSchema = z.object({
@@ -15,8 +20,8 @@ const formSchema = z.object({
     city: z.string({
         required_error: "city is required",
     }),
-    country: z.string({
-        required_error: "country is required",
+    county: z.string({
+        required_error: "county is required",
     }),
     deliveryPrice: z.coerce.number({
         required_error: "delivery price is required",
@@ -47,12 +52,13 @@ const formSchema = z.object({
 type RestaurantFormData = z.infer<typeof formSchema>;
 
 type Props = {
+    restaurant?: Restaurant;
     onSave: (restaurantFormData: FormData) => void;
     isLoading: boolean;
 
 };
 
-const ManageRestaurantForm = ({isLoading}: Props) => {
+const ManageRestaurantForm = ({onSave, isLoading, restaurant}: Props) => {
     const form = useForm<RestaurantFormData>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -60,9 +66,57 @@ const ManageRestaurantForm = ({isLoading}: Props) => {
             menuItems: [{name: "", price: 0}],
         },
     });
-    const onSubmit = (formDataJson: restaurantFormData) => {
+
+    // use effect hook to run on first load
+    useEffect(() => {
+        if(!restaurant) {
+            return;
+        }
+
+        const deliveryPriceFormatted = parseInt((restaurant.deliveryPrice/100).toFixed(2));
+
+        const menuItemsFormatted = restaurant.menuItems.map((item) => ({
+            ...item,
+             price: parseInt((item.price / 100).toFixed(2)),
+        }));
+
+        const updatedRestaurant = {
+            ...restaurant,
+            deliverPrice: deliveryPriceFormatted,
+            menuItems: menuItemsFormatted,
+        };
+
+        form.reset(updatedRestaurant);
+    }, [form, restaurant]);
+
+
+    const onSubmit = (formDataJson: RestaurantFormData) => {
         //  convert form DataJson to a new object
-    }
+        const formData = new FormData();
+
+        formData.append("restaurantName", formDataJson.restaurantName);
+        formData.append("city", formDataJson.city)
+        formData.append("county", formDataJson.county);
+
+        formData.append("deliveryPrice", (formDataJson.deliveryPrice).toString()
+        );
+        formData.append("estimatedDeliveryTime", formDataJson.estimatedDeliveryTime.toString());
+
+        formDataJson.cuisines.forEach((cuisine, index) => {
+            formData.append(`cuisines[${index}]`, cuisine);
+        });
+        formDataJson.menuItems.forEach((menuItem, index) => {
+            formData.append(`menuItems[${index}][name]`, menuItem.name)
+            formData.append(`menuItems[${index}][price]`, (menuItem.price).toString()
+            );
+        });
+
+        if (formDataJson.imageFile) {
+            formData.append(`imageFile`, formDataJson.imageFile);
+        }
+
+        onSave(formData);
+    };
 
     return (
         <Form {...form}>
@@ -77,6 +131,7 @@ const ManageRestaurantForm = ({isLoading}: Props) => {
                 <MenuSection />
                 <Separator />
                 <ImageSection />
+                {isLoading ? <LoadingButton /> : <Button type="submit">Submit</Button> }
             </form>
         </Form>
     );
