@@ -1,6 +1,6 @@
 import express from "express";
 import multer from "multer";
-import MyRestaurantControllers from "../controllers/MyRestaurantControllers";
+import MyRestaurantController from "../controllers/MyRestaurantController";
 import {jwtCheck, jwtParse} from "../middleware/auth";
 import {validateMyUserRequest} from "../middleware/validation";
 
@@ -16,8 +16,7 @@ const upload = multer({
 });
 
 // get /api/my/restaurant
-router.get("/", jwtCheck, jwtParse, MyRestaurantControllers.getMyRestaurant);
-
+router.get("/", jwtCheck, jwtParse, MyRestaurantController.getMyRestaurant);
 
 //create new restaurant /api/my/restaurant
 router.post("/",
@@ -25,14 +24,14 @@ router.post("/",
     validateMyUserRequest,
     jwtCheck,
     jwtParse,
-    MyRestaurantControllers.createMyRestaurant);
+    MyRestaurantController.createMyRestaurant);
 
 // update my restaurant /api/my/restaurant
 router.put("/",upload.single("imageFile"),
     validateMyUserRequest,
     jwtCheck,
     jwtParse,
-    MyRestaurantControllers.updateMyRestaurant
+    MyRestaurantController.updateMyRestaurant
 );
 
 
