@@ -22,6 +22,6 @@ export  const cuisineList = [
     "Fish & Chips",
     "Bakery",
     "Vegetarian",
-    "Kids Friendly",
+    "Kids menu",
     "Pork chops",
 ];

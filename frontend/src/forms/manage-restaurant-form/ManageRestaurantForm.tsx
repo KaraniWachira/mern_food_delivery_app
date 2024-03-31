@@ -42,7 +42,8 @@ const formSchema = z.object({
     ),
     imageUrl: z.string().optional(),
     imageFile: z.instanceof(File, { message: "image is required" }).optional(),
-}).refine((data) => data.imageUrl || data.imageFile, {
+    })
+    .refine((data) => data.imageUrl || data.imageFile, {
         message: "Either image URL or image File must be provided",
         path: ["imageFile"],
 });
@@ -71,7 +72,10 @@ const ManageRestaurantForm = ({onSave, isLoading, restaurant}: Props) => {
             return;
         }
 
-        const deliveryPriceFormatted = parseInt((restaurant.deliveryPrice/100).toFixed(2));
+        // price lowest domination of 100 = 100pence == 1GBP
+        const deliveryPriceFormatted = parseInt(
+            (restaurant.deliveryPrice/100).toFixed(2)
+        );
 
         const menuItemsFormatted = restaurant.menuItems.map((item) => ({
             ...item,
@@ -96,16 +100,21 @@ const ManageRestaurantForm = ({onSave, isLoading, restaurant}: Props) => {
         formData.append("city", formDataJson.city)
         formData.append("county", formDataJson.county);
 
-        formData.append("deliveryPrice", (formDataJson.deliveryPrice).toString()
+        formData.append(
+            "deliveryPrice", (formDataJson.deliveryPrice * 100).toString()
         );
-        formData.append("estimatedDeliveryTime", formDataJson.estimatedDeliveryTime.toString());
+        formData.append(
+            "estimatedDeliveryTime",
+            formDataJson.estimatedDeliveryTime.toString()
+        );
 
         formDataJson.cuisines.forEach((cuisine, index) => {
             formData.append(`cuisines[${index}]`, cuisine);
         });
         formDataJson.menuItems.forEach((menuItem, index) => {
-            formData.append(`menuItems[${index}][name]`, menuItem.name)
-            formData.append(`menuItems[${index}][price]`, (menuItem.price).toString()
+            formData.append(`menuItems[${index}][name]`, menuItem.name);
+            formData.append(`menuItems[${index}][price]`,
+                (menuItem.price * 100).toString()
             );
         });
 

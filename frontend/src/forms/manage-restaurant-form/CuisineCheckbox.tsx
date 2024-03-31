@@ -27,7 +27,7 @@ const CuisineCheckbox = ({cuisine, field }: Props) => {
             </FormControl>
             <FormLabel className="text-sm font-normal">{cuisine}</FormLabel>
         </FormItem>
-    )
+    );
 };
 export default CuisineCheckbox;
 
